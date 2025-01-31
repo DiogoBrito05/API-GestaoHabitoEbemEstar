@@ -15,4 +15,4 @@
 - Autenticação JWT: Perfis de usuários com sugestões personalizadas.
 
 
-![Fluxo do Projeto -->](GESTAHABITOSEBEMESTAR/Fluxo_API-Gestao.pdf)
+![Fluxo do Projeto -->](GESTAHABITOSEBEMESTAR/Fluxo_API-Gestao.png)
