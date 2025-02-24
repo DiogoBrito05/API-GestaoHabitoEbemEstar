@@ -2,6 +2,7 @@ package API_GestaHabitosEbemEstar.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,6 +65,18 @@ public class CategoryController {
         }
         List<Category> allCategory = categoryService.categoryList(userId, token);
         return ResponseEntity.ok(allCategory);
+    }
+
+    // ==============ainda falta acabar
+    @GetMapping("/search/{categoryId}")
+    public ResponseEntity<?> getCategory(@PathVariable Integer categoryId,
+            @RequestHeader("Authorization") String authorizationHeader) {
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        }
+        Category category = categoryService.getCategory(categoryId, token);
+        return ResponseEntity.ok(category);
     }
 
 }

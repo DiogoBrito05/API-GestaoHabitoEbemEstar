@@ -2,6 +2,8 @@ package API_GestaHabitosEbemEstar.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,27 +137,30 @@ public class CategoryService {
         }
     }
 
-
-        // public List<Category> categoryList(Integer userID,String token) {
-    // try {
-    // logger.info("starting category listing");
-
-    // Category existingCategory = repository.findByUserID(userID)
-    // .orElseThrow(() -> new ExceptionHandler.NotFoundException("Catefory not
-    // found!"));
-
-    // String userRole = jwtService.getRole(token);
-
-    // usersService.checkUserPermission(userRole, existingCategory.getUserId() ,
-    // userID);
-
-    // var list = repository.findAll();
-    // return list;
-    // } catch (Exception e) {
-    // Throwable rootCause = getRootCause(e);
-    // logger.error("Error listing categorys.", rootCause);
-    // throw new ExceptionHandler.BadRequestException("Error listing categorys.
-    // details: " + e.getMessage());
-    // }
-    // }
+//=========================ainda falta acabar
+    public Category getCategory(Integer categoryId, String token) {
+        try {
+            logger.info("starting category retrieval");
+    
+            String userIdString = jwtService.getUserId(token);
+            Integer userIdInteger = Integer.parseInt(userIdString);
+            String userRole = jwtService.getRole(token);
+            
+            usersService.checkUserPermission(userRole, userIdInteger, userIdInteger); 
+    
+            // Buscar a categoria específica associada ao userID
+            Optional<Category> category = repository.findByidCategory(categoryId);
+    
+            if (!category.isPresent()) {
+                throw new ExceptionHandler.NotFoundException("Category not found" );
+            }
+    
+            return category.get();  
+        } catch (Exception e) {
+            Throwable rootCause = getRootCause(e);
+            logger.error("Error retrieving category.", rootCause);
+            throw new ExceptionHandler.BadRequestException("Error retrieving category. details: " + e.getMessage());
+        }
+    }
+    
 }
