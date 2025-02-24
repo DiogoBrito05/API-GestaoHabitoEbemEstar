@@ -18,6 +18,9 @@ public class RoleService {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private UsersService usersService;
+
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
 
@@ -37,10 +40,7 @@ public class RoleService {
 
             String userRole = jwtService.getRole(token);
 
-            if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
-                logger.warn("User without permission");
-                throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
-            }
+            usersService.checkAdminPermission(userRole);
 
             return roleRepository.save(role);
         } catch (ExceptionHandler.Conflict e) {

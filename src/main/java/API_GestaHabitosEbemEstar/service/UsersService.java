@@ -164,7 +164,7 @@ public class UsersService {
             return;
         }
         if (!existingUserId.equals(userIdInteger)) {
-            throw new ExceptionHandler.BadRequestException("You do not have permission to modify this user!");
+            throw new ExceptionHandler.BadRequestException("You are not allowed to make changes!");
         }
     }
 

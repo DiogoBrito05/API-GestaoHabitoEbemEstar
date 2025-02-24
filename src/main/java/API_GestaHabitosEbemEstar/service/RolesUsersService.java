@@ -26,6 +26,8 @@ public class RolesUsersService {
     private UserRepository userRepository;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private UsersService usersService;
 
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
@@ -46,10 +48,7 @@ public class RolesUsersService {
         try {
             String userRole = jwtService.getRole(token);
 
-            if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
-                logger.warn("User without permission tried to modify a user. Extracted role: {}", userRole);
-                throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
-            }
+            usersService.checkAdminPermission(userRole);
 
             // Verifica se o usuário existe
             UsersModel user = userRepository.findById(userId).orElseThrow(() -> {
