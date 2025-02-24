@@ -11,7 +11,6 @@ import API_GestaHabitosEbemEstar.models.UsersModel;
 import API_GestaHabitosEbemEstar.repository.RolesRepository;
 import API_GestaHabitosEbemEstar.repository.UserRepository;
 import java.util.List;
-
 import org.slf4j.Logger;
 
 @Service
@@ -83,16 +82,16 @@ public class UsersService {
             UsersModel existingUser = repository.findByidUser(userId)
                     .orElseThrow(() -> new ExceptionHandler.NotFoundException("User not found!"));
 
-            // boolean isAdmin = "ADMIN".equals(role.trim().toUpperCase());
+            // // Se for ADMIN, ele pode alterar qualquer usuário
+            // if (role.contains("ADMIN")) {
+            //     logger.info("User is ADMIN. Skipping ownership check.");
+            // }
+            // // Se não for ADMIN, só pode modificar a própria conta
+            // else if (!existingUser.getIdUser().equals(userIdInteger)) {
+            //     throw new ExceptionHandler.BadRequestException("You do not have permission to modify this user!");
+            // }
 
-            // Se for ADMIN, ele pode alterar qualquer usuário
-            if (role.contains("ADMIN")) {
-                logger.info("User is ADMIN. Skipping ownership check.");
-            }
-            // Se não for ADMIN, só pode modificar a própria conta
-            else if (!existingUser.getIdUser().equals(userIdInteger)) {
-                throw new ExceptionHandler.BadRequestException("You do not have permission to modify this user!");
-            }
+            checkUserPermission(role, existingUser.getIdUser(), userIdInteger);
 
             if (user.getEmail() != null) {
                 existingUser.setEmail(user.getEmail());
@@ -124,14 +123,7 @@ public class UsersService {
             UsersModel existingUser = repository.findByidUser(userId)
                     .orElseThrow(() -> new ExceptionHandler.NotFoundException("User not found!"));
 
-            // Se for ADMIN, ele pode excluir qualquer usuário
-            if (role.contains("ADMIN")) {
-                logger.info("User is ADMIN. Skipping ownership check.");
-            }
-            // Se não for ADMIN, só pode excluir a própria conta
-            else if (!existingUser.getIdUser().equals(userIdInteger)) {
-                throw new ExceptionHandler.BadRequestException("You do not have permission to delete this user!");
-            }
+            checkUserPermission(role, existingUser.getIdUser(), userIdInteger);
 
             // Realiza a exclusão do usuário
             repository.deleteById(userId);
@@ -153,10 +145,7 @@ public class UsersService {
 
             String userRole = jwtService.getRole(token);
 
-            if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
-                logger.warn("User without permission");
-                throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
-            }
+            checkAdminPermission(userRole);
 
             var list = repository.findAll();
             return list;
@@ -166,5 +155,25 @@ public class UsersService {
             throw new ExceptionHandler.BadRequestException("Error listing users. details: " + e.getMessage());
         }
     }
+//=======================================================================================================================
+    // Verifica se o Usuário é ADMIN,se for ele pode acessar qualquer endpoint
+    // Se não for ADMIN, só pode modificar a própria conta
+    public void checkUserPermission(String role, Integer existingUserId, Integer userIdInteger) {
+        if (role.contains("ADMIN")) {
+            logger.info("User is ADMIN. Skipping ownership check.");
+            return;
+        }
+        if (!existingUserId.equals(userIdInteger)) {
+            throw new ExceptionHandler.BadRequestException("You do not have permission to modify this user!");
+        }
+    }
 
+    //Verifica se o usuario é "ADMIN"
+    public void checkAdminPermission(String userRole) {
+        if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
+            logger.warn("User without permission");
+            throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
+        }
+    }
+    
 }
