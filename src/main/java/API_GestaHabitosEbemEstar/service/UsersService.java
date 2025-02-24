@@ -6,7 +6,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import API_GestaHabitosEbemEstar.config.exception.ExceptionHandler;
 import API_GestaHabitosEbemEstar.config.security.JwtService;
+import API_GestaHabitosEbemEstar.models.Roles;
 import API_GestaHabitosEbemEstar.models.UsersModel;
+import API_GestaHabitosEbemEstar.repository.RolesRepository;
 import API_GestaHabitosEbemEstar.repository.UserRepository;
 import java.util.List;
 
@@ -23,6 +25,9 @@ public class UsersService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private RolesRepository roleRepository;
 
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
@@ -50,6 +55,11 @@ public class UsersService {
 
             // Criptografa a senha antes de salvar
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+            Roles userRole = roleRepository.findById(2)
+                    .orElseThrow(() -> new ExceptionHandler.NotFoundException("Role USER not found!"));
+
+            user.getRoles().add(userRole);
 
             return repository.save(user);
         } catch (ExceptionHandler.Conflict e) {
@@ -104,12 +114,52 @@ public class UsersService {
         }
     }
 
-    public List<UsersModel> userList() {
+    public void cancelUser(Integer userId, String token) {
+        logger.info("Initiating user deletion, UserID={}", userId);
+        try {
+            String userIdString = jwtService.getUserId(token);
+            Integer userIdInteger = Integer.parseInt(userIdString);
+            String role = jwtService.getRole(token);
+
+            UsersModel existingUser = repository.findByidUser(userId)
+                    .orElseThrow(() -> new ExceptionHandler.NotFoundException("User not found!"));
+
+            // Se for ADMIN, ele pode excluir qualquer usuário
+            if (role.contains("ADMIN")) {
+                logger.info("User is ADMIN. Skipping ownership check.");
+            }
+            // Se não for ADMIN, só pode excluir a própria conta
+            else if (!existingUser.getIdUser().equals(userIdInteger)) {
+                throw new ExceptionHandler.BadRequestException("You do not have permission to delete this user!");
+            }
+
+            // Realiza a exclusão do usuário
+            repository.deleteById(userId);
+            logger.info("User with ID {} deleted successfully.", userId);
+
+        } catch (ExceptionHandler.NotFoundException e) {
+            throw e;
+        } catch (ExceptionHandler.BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error deleting user.", e);
+            throw new ExceptionHandler.BadRequestException("Error deleting user. Details: " + e.getMessage());
+        }
+    }
+
+    public List<UsersModel> userList(String token) {
         try {
             logger.info("starting user listing");
-            var teste = repository.findAll();
 
-            return teste;
+            String userRole = jwtService.getRole(token);
+
+            if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
+                logger.warn("User without permission");
+                throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
+            }
+
+            var list = repository.findAll();
+            return list;
         } catch (Exception e) {
             Throwable rootCause = getRootCause(e);
             logger.error("Error listing users.", rootCause);

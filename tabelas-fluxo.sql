@@ -73,3 +73,8 @@ CREATE TABLE notificacoes (
     STATUS ENUM('pendente', 'enviado', 'lido') DEFAULT 'pendente',
     FOREIGN KEY (USUARIO_ID) REFERENCES usuarios(ID) ON DELETE CASCADE
 );
+
+-- Por Padrão a ROLE user tem que ser com o ID 2. Na hora do registro de user já faço a relação dela com o usuário;
+INSERT INTO roles (ID,NOME,DESCRICAO) VALUES ( 1,"ADMIN","ADMIN");
+INSERT INTO roles (ID,NOME,DESCRICAO) VALUES ( 1,"USER","USER");
+INSERT INTO usuarios_roles (USUARIO_ID, ROLE_ID) VALUES ( 1, 1);
