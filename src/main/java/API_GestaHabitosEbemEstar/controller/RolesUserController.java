@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +19,12 @@ public class RolesUserController {
     private RolesUsersService roleUserService;
 
     @PostMapping("/assign")
-    public ResponseEntity<?> relateUserAndRole(@RequestBody RolesUser roleUser, @RequestParam Integer userId) {
-        RolesUser newRelation = roleUserService.relateUserToRole(roleUser, userId);
+    public ResponseEntity<?> relateUserAndRole(@RequestBody RolesUser roleUser, @RequestParam Integer userId, @RequestHeader("Authorization") String authorizationHeader) {
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                token = authorizationHeader.substring(7);
+        }
+        RolesUser newRelation = roleUserService.relateUserToRole(roleUser, userId, token);
         return ResponseEntity.ok(newRelation);
     }
 }

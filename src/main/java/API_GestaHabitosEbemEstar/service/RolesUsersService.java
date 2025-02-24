@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import API_GestaHabitosEbemEstar.config.exception.ExceptionHandler;
+import API_GestaHabitosEbemEstar.config.security.JwtService;
 import API_GestaHabitosEbemEstar.models.Roles;
 import API_GestaHabitosEbemEstar.models.RolesUser;
 import API_GestaHabitosEbemEstar.models.UsersModel;
@@ -21,10 +22,11 @@ public class RolesUsersService {
     private RolesRepository roleRepository;
     @Autowired
     private RolesUserRepository roleUserRepository;
-    @Autowired 
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private JwtService jwtService;
 
-    
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
 
@@ -38,19 +40,27 @@ public class RolesUsersService {
         return result;
     }
 
-    @Transactional// ainda precisa ser testado 
-    public RolesUser relateUserToRole(RolesUser roleUser, Integer userId) {
+    //Relação de usuário com a role de permissão 
+    @Transactional 
+    public RolesUser relateUserToRole(RolesUser roleUser, Integer userId, String token) {
         try {
+            String userRole = jwtService.getRole(token);
+
+            if (userRole == null || (!userRole.equals("ADMIN") && !userRole.contains("ADMIN"))) {
+                logger.warn("User without permission tried to modify a user. Extracted role: {}", userRole);
+                throw new ExceptionHandler.BadRequestException("You do not have permission to access this menu!");
+            }
+
             // Verifica se o usuário existe
             UsersModel user = userRepository.findById(userId).orElseThrow(() -> {
-                logger.error("Usuário com ID {} não encontrado!", userId);
-                return new ExceptionHandler.NotFoundException("Usuário não encontrado!");
+                logger.error("User with id{} not found", userId);
+                return new ExceptionHandler.NotFoundException("User not found!");
             });
 
             // Verifica se a Role existe
             Roles role = roleRepository.findByidRoles(roleUser.getRoleId()).orElseThrow(() -> {
-                logger.error("Role com ID {} não encontrada!", roleUser.getRoleId());
-                return new RoleNotFoundException("Role não encontrada!");
+                logger.error("Role with id{} not found!", roleUser.getRoleId());
+                return new RoleNotFoundException("Role not found!");
             });
 
             // Relaciona usuário e role
@@ -60,9 +70,12 @@ public class RolesUsersService {
 
             return roleUser;
 
+        } catch (ExceptionHandler.BadRequestException e) {
+            throw e;
         } catch (Exception e) {
-            logger.error("Erro ao associar usuário {} à role {}.", userId, roleUser.getRoleId(), e);
-            throw new ExceptionHandler.BadRequestException("Erro ao associar usuário à role. Detalhes: " + e.getMessage());
+            logger.error("Error when associating user {} with role {}.", userId, roleUser.getRoleId(), e);
+            throw new ExceptionHandler.BadRequestException(
+                    "Error when associating user to role. Details: " + e.getMessage());
         }
     }
 
