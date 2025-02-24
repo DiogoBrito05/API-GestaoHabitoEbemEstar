@@ -21,5 +21,9 @@ public class Category {
     @Column(name = "NOME")
     private String nameCategory;
 
+    @Column(name = "USUARIO_ID")
+    private Integer userId;
+
+
 
 }

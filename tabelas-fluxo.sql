@@ -28,7 +28,9 @@ CREATE TABLE usuarios_roles (
 -- Tabela de Categorias
 CREATE TABLE categorias (
     ID INT AUTO_INCREMENT PRIMARY KEY,
-    NOME VARCHAR(50) NOT NULL UNIQUE
+    NOME VARCHAR(50) NOT NULL UNIQUE,
+    USUARIO_ID INT NOT NULL,
+    FOREIGN KEY (USUARIO_ID) REFERENCES usuarios(ID) ON DELETE CASCADE
 );
 
 -- Tabela de Hábitos
@@ -76,5 +78,5 @@ CREATE TABLE notificacoes (
 
 -- Por Padrão a ROLE user tem que ser com o ID 2. Na hora do registro de user já faço a relação dela com o usuário;
 INSERT INTO roles (ID,NOME,DESCRICAO) VALUES ( 1,"ADMIN","ADMIN");
-INSERT INTO roles (ID,NOME,DESCRICAO) VALUES ( 1,"USER","USER");
+INSERT INTO roles (ID,NOME,DESCRICAO) VALUES ( 2,"USER","USER");
 INSERT INTO usuarios_roles (USUARIO_ID, ROLE_ID) VALUES ( 1, 1);

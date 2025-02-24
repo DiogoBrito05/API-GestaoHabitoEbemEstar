@@ -1,5 +1,6 @@
 package API_GestaHabitosEbemEstar.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,7 @@ import API_GestaHabitosEbemEstar.models.Category;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     Optional<Category> findByidCategory(Integer IdCategory);
+
+    List<Category> findAllByUserId(Integer userID);
 
 }
