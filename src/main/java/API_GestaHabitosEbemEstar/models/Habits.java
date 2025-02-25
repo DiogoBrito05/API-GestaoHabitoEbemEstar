@@ -22,6 +22,12 @@ public class Habits {
     @Column(name = "USUARIO_ID")
     private Integer idUser;
 
+    @Column(name = "NOME")
+    private String name;
+
+    @Column(name = "CATEGORIA_ID")
+    private Integer categoryId;
+
     @Column(name = "DESCRICAO")
     private String description;
 
