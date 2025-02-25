@@ -3,7 +3,6 @@ package API_GestaHabitosEbemEstar.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,30 +136,30 @@ public class CategoryService {
         }
     }
 
-//=========================ainda falta acabar
     public Category getCategory(Integer categoryId, String token) {
         try {
-            logger.info("starting category retrieval");
+            logger.info("Starting category retrieval");
     
-            String userIdString = jwtService.getUserId(token);
-            Integer userIdInteger = Integer.parseInt(userIdString);
+            Integer userIdFromToken = Integer.valueOf(jwtService.getUserId(token));
             String userRole = jwtService.getRole(token);
-            
-            usersService.checkUserPermission(userRole, userIdInteger, userIdInteger); 
     
-            // Buscar a categoria específica associada ao userID
-            Optional<Category> category = repository.findByidCategory(categoryId);
+            Optional<Category> categoryOptional = repository.findById(categoryId);
     
-            if (!category.isPresent()) {
-                throw new ExceptionHandler.NotFoundException("Category not found" );
+            if (!categoryOptional.isPresent()) {
+                throw new ExceptionHandler.NotFoundException("Category not found with ID " + categoryId);
             }
     
-            return category.get();  
+            Category category = categoryOptional.get();
+    
+            usersService.checkUserPermission(userRole, category.getUserId(), userIdFromToken);
+    
+            return category;
         } catch (Exception e) {
             Throwable rootCause = getRootCause(e);
             logger.error("Error retrieving category.", rootCause);
-            throw new ExceptionHandler.BadRequestException("Error retrieving category. details: " + e.getMessage());
+            throw new ExceptionHandler.BadRequestException("Error retrieving category. Details: " + e.getMessage());
         }
     }
+    
     
 }
