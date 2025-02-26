@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import API_GestaHabitosEbemEstar.service.RoleService;
+import API_GestaHabitosEbemEstar.config.security.ExtractBearer;
 import API_GestaHabitosEbemEstar.models.Roles;
 
 @RestController
@@ -17,12 +18,13 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-   @PostMapping("/roleRegistration")
-    public ResponseEntity<?> createRole(@RequestBody Roles role, @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+    @Autowired
+    private ExtractBearer extratorBearer;
+
+    @PostMapping("/roleRegistration")
+    public ResponseEntity<?> createRole(@RequestBody Roles role,
+            @RequestHeader("Authorization") String authorizationHeader) {
+        String token = extratorBearer.extractToken(authorizationHeader);
         Roles newRole = roleService.registrationRole(role, token);
         return ResponseEntity.ok(newRole);
     }

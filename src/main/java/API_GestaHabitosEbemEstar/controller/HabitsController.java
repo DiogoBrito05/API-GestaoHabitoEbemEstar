@@ -23,17 +23,13 @@ public class HabitsController {
     @Autowired
     private HabitsService service;
 
-
     @Autowired
     private ExtractBearer extratorBearer;
 
     @PostMapping("/newHabits")
     public ResponseEntity<?> registerHabits(@RequestBody Habits request,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Habits habitsNEW = service.createHabits(request, token);
         return ResponseEntity.ok(habitsNEW);
     }
@@ -41,22 +37,15 @@ public class HabitsController {
     @PutMapping("/Update/{habitsId}")
     public ResponseEntity<?> categoryUpdate(@PathVariable Integer habitsId, @RequestBody Habits updHabits,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Habits newHabits = service.updateHabits(habitsId, updHabits, token);
         return ResponseEntity.ok(newHabits);
     }
 
-
     @GetMapping("/search/{habitsId}")
     public ResponseEntity<?> getHabits(@PathVariable Integer habitsId,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Habits habits = service.searchHabits(habitsId, token);
         return ResponseEntity.ok(habits);
     }
@@ -64,10 +53,7 @@ public class HabitsController {
     @GetMapping("/list/{userId}")
     public ResponseEntity<?> listCategory(@PathVariable Integer userId,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         List<Habits> allhabits = service.habitsList(userId, token);
         return ResponseEntity.ok(allhabits);
     }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import API_GestaHabitosEbemEstar.config.security.ExtractBearer;
 import API_GestaHabitosEbemEstar.models.Category;
 import API_GestaHabitosEbemEstar.service.CategoryService;
 
@@ -22,13 +23,13 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private ExtractBearer extratorBearer;
+
     @PostMapping("/register")
     public ResponseEntity<?> registrationCategory(@RequestBody Category category,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Category newCategory = categoryService.insertCategory(category, token);
         return ResponseEntity.ok(newCategory);
     }
@@ -36,10 +37,7 @@ public class CategoryController {
     @PutMapping("/categoryUpdate/{categoryId}")
     public ResponseEntity<?> categoryUpdate(@PathVariable Integer categoryId, @RequestBody Category category,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Category newCategory = categoryService.updateCategory(categoryId, category, token);
         return ResponseEntity.ok(newCategory);
     }
@@ -47,10 +45,7 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<?> categoryDelete(@PathVariable Integer categoryId,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         categoryService.deleteCategory(categoryId, token);
         return ResponseEntity.ok("Category deleted successfully.");
     }
@@ -58,10 +53,7 @@ public class CategoryController {
     @GetMapping("/listCategorys/{userId}")
     public ResponseEntity<?> listCategory(@PathVariable Integer userId,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         List<Category> allCategory = categoryService.categoryList(userId, token);
         return ResponseEntity.ok(allCategory);
     }
@@ -69,10 +61,7 @@ public class CategoryController {
     @GetMapping("/search/{categoryId}")
     public ResponseEntity<?> getCategory(@PathVariable Integer categoryId,
             @RequestHeader("Authorization") String authorizationHeader) {
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
+        String token = extratorBearer.extractToken(authorizationHeader);
         Category category = categoryService.getCategory(categoryId, token);
         return ResponseEntity.ok(category);
     }
