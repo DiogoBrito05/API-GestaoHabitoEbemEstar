@@ -1,5 +1,8 @@
 package API_GestaHabitosEbemEstar.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +117,75 @@ public class HabitsService {
             throw new ExceptionHandler.BadRequestException("Error updating category. details: " + e.getMessage());
         }
 
+    }
+
+    public Habits searchHabits(Integer habitsId, String token) {
+        try {
+            logger.info("Habit recovery started");
+
+            Integer userIdFromToken = Integer.valueOf(jwtService.getUserId(token));
+            String userRole = jwtService.getRole(token);
+
+            Optional<Habits> optionalHabits = repository.findById(habitsId);
+
+            if (!optionalHabits.isPresent()) {
+                throw new ExceptionHandler.NotFoundException("Habits not found with ID " + habitsId);
+            }
+
+            Habits requestHabits = optionalHabits.get();
+
+            usersService.checkUserPermission(userRole, requestHabits.getIdUser(), userIdFromToken);
+
+            return requestHabits;
+        } catch (Exception e) {
+            Throwable rootCause = getRootCause(e);
+            logger.error("Error retrieving habits.", rootCause);
+            throw new ExceptionHandler.BadRequestException("Error retrieving habits. Details: " + e.getMessage());
+        }
+    }
+
+    public List<Habits> habitsList(Integer userId, String token) {
+        try {
+            logger.info("starting habits listing");
+
+            Integer userIdFromToken = Integer.valueOf(jwtService.getUserId(token));
+            String userRole = jwtService.getRole(token);
+
+            usersService.checkUserPermission(userRole, userIdFromToken, userId);
+
+            List<Habits> searchHabits = repository.findAllByIdUser(userId);
+
+            if (searchHabits.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return searchHabits;
+        } catch (Exception e) {
+            Throwable rootCause = getRootCause(e);
+            logger.error("Error listing habits.", rootCause);
+            throw new ExceptionHandler.BadRequestException("Error listing habits. details: " + e.getMessage());
+        }
+    }
+
+    public void habitDeleter(Integer habitsId, String token) {
+        logger.info("Initiating habits deletion, UserID={}", habitsId);
+        try {
+            Integer userIdFromToken = Integer.valueOf(jwtService.getUserId(token));
+            String role = jwtService.getRole(token);
+
+            Habits existingHabits = repository.findById(habitsId)
+                    .orElseThrow(() -> new ExceptionHandler.NotFoundException("Habits not found!"));
+
+            usersService.checkUserPermission(role, existingHabits.getIdUser(), userIdFromToken);
+
+            repository.deleteById(habitsId);
+            logger.info("Habits with ID {} deleted successfully.", habitsId);
+
+        } catch (ExceptionHandler.NotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error deleting Habits.", e);
+            throw new ExceptionHandler.BadRequestException("Error deleting Habits. Details: " + e.getMessage());
+        }
     }
 
 }
