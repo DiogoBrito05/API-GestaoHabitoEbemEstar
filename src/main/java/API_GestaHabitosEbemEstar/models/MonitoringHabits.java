@@ -1,5 +1,6 @@
 package API_GestaHabitosEbemEstar.models;
 
+import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,5 +20,12 @@ public class MonitoringHabits {
     private Integer idMonitoring;
 
     @Column(name = "HABITO_ID")
-    private String idHabits;
+    private Integer idHabits;
+
+    @Column(name = "DATA")
+    private LocalDate date;
+
+    @Column(name = " Status")
+    private String status;
+
 }
