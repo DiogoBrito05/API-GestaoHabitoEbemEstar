@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import API_GestaHabitosEbemEstar.config.exception.ExceptionHandler;
 import API_GestaHabitosEbemEstar.config.security.JwtService;
 import API_GestaHabitosEbemEstar.models.Category;
+import API_GestaHabitosEbemEstar.models.Habits;
 import API_GestaHabitosEbemEstar.repository.CategoryRepository;
+import API_GestaHabitosEbemEstar.repository.HabitsRepository;
 
 @Service
 public class CategoryService {
@@ -23,6 +25,9 @@ public class CategoryService {
 
     @Autowired
     private UsersService usersService;
+
+    @Autowired
+    private HabitsRepository habitsRepository;
 
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
@@ -99,6 +104,12 @@ public class CategoryService {
                     .orElseThrow(() -> new ExceptionHandler.NotFoundException("Catefory not found!"));
 
             usersService.checkUserPermission(role, existingCategory.getUserId(), userIdInteger);
+
+            //Faço a verificação se há alguma categoria relacionado a algum hábito.
+            boolean hasHabits = habitsRepository.existsByCategoryId(categoryId);
+            if (hasHabits) {
+                throw new ExceptionHandler.BadRequestException("You cannot delete this category because it is associated with a habit!");
+            }
 
             repository.deleteById(categoryId);
             logger.info("Category with ID {} deleted successfully.", categoryId);

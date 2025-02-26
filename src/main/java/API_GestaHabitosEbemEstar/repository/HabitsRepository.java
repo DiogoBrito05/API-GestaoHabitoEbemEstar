@@ -11,4 +11,7 @@ public interface HabitsRepository extends JpaRepository<Habits, Integer> {
 
     List<Habits> findAllByIdUser(Integer userId);
 
+    boolean existsByCategoryId(Integer categoryId);
+
+
 }
