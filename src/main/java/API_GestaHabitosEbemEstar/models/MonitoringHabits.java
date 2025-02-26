@@ -19,6 +19,9 @@ public class MonitoringHabits {
     @Column(name = "ID")
     private Integer idMonitoring;
 
+    @Column(name = "USUARIO_ID")
+    private Integer idUser;
+
     @Column(name = "HABITO_ID")
     private Integer idHabits;
 
