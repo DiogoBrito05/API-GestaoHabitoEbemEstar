@@ -24,13 +24,4 @@ public class Notifications {
     @Column(name = "MENSAGEM")
     private String mesage;
 
-    @Column(name = "DATA_ENVIO")
-    private String  dateShipping;
-
-    @Column(name = "STATUS")
-    private Enum status;
-
 }
-
-
-
