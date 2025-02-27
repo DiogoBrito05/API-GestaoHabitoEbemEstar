@@ -1,5 +1,6 @@
 package API_GestaHabitosEbemEstar.service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,17 +40,19 @@ public class MonitoringHabitsService {
         return result;
     }
 
-    public MonitoringHabits creationMonitoring(MonitoringHabits request, String token) {
+    public MonitoringHabits creationMonitoring( String token,Integer idHabits) {
         logger.info(
                 "Starting to record monitoring with data: ");
         try {
 
             Integer userIdFromToken = Integer.valueOf(jwtService.getUserId(token));
+            MonitoringHabits request = new MonitoringHabits();
 
-            if (request.getIdHabits() != null) {
-                habitsService.searchHabits(request.getIdHabits(), token);
-            }
+            LocalDate currentDate = LocalDate.now();
             request.setIdUser(userIdFromToken);
+            request.setStatus("Pendente");
+            request.setDate(currentDate);
+            request.setIdHabits(idHabits);
 
             return repository.save(request);
         } catch (ExceptionHandler.Conflict e) {

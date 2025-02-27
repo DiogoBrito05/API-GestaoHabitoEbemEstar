@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import API_GestaHabitosEbemEstar.config.exception.ExceptionHandler;
 import API_GestaHabitosEbemEstar.config.security.JwtService;
@@ -26,6 +27,13 @@ public class HabitsService {
 
     @Autowired
     private UsersService usersService;
+
+    //Usei esse construtor para resolver um erro de depência que estava acontecendo 
+    private final MonitoringHabitsService monitoringService;
+
+    public HabitsService(@Lazy MonitoringHabitsService monitoringService) {
+        this.monitoringService = monitoringService;
+    }
 
     // Logger personalizado para mensagens de INFO manuais
     private static final Logger logger = LoggerFactory.getLogger("logs");
@@ -57,7 +65,12 @@ public class HabitsService {
 
             requeHabits.setIdUser(userIdFromToken);
 
-            return repository.save(requeHabits);
+            Habits savedHabit = repository.save(requeHabits);
+
+            //Cria o monitoramento do hábito
+            monitoringService.creationMonitoring(token, savedHabit.getIdHabits());
+
+            return savedHabit;
         } catch (ExceptionHandler.Conflict e) {
             throw e;
         } catch (Exception e) {
