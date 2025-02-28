@@ -67,6 +67,4 @@ public class NotificationsController {
 
 }
 
-// Pendente – A tarefa ainda não foi iniciada.
-// Em andamento – A tarefa está em progresso.
-// Concluído – A tarefa foi finalizada com sucesso.
+

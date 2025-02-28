@@ -24,4 +24,8 @@ public class Notifications {
     @Column(name = "MENSAGEM")
     private String mesage;
 
+    @Column(name = "PADRAO_STATUS")
+    private String standard;
+
+
 }

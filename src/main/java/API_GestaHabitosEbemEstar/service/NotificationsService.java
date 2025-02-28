@@ -105,6 +105,10 @@ public class NotificationsService {
                 existingNotifications.setMesage(mesage.getMesage());
             }
 
+            if (mesage.getStandard() != null) {
+                existingNotifications.setStandard(mesage.getStandard());
+            }
+
             Notifications updatedNotifications = repository.save(existingNotifications);
 
             return updatedNotifications;
