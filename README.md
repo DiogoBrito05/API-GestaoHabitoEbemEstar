@@ -16,3 +16,27 @@
 
 
 ![Fluxo do Projeto -->](Fluxo_API-Gestao.png)
+
+
+## :rocket: Tecnologias Utilizadas
+
+<table>
+<tr>
+  <td>Linguagem de Programação</td>
+  <td>Framework Backend</td>
+  <td>Persistência de Dados</td>
+  <td>Segurança</td>
+  <td>Banco de Dados</td>
+  <td>Gerenciamento de Dependências</td>
+</tr>
+<tr>
+  <td>Java 21.0</td>
+  <td>Spring Boot 3.4.1</td>
+  <td>Spring Data JPA</td>
+  <td>Spring Security</td>
+  <td>MySQLWorkbench 8.0</td>
+  <td>Maven</td>
+</tr>
+</table>
+
+
