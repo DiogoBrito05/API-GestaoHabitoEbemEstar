@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import API_GestaHabitosEbemEstar.config.exception.ExceptionHandler;
 import API_GestaHabitosEbemEstar.config.security.JwtService;
 import API_GestaHabitosEbemEstar.models.MonitoringHabits;
+import API_GestaHabitosEbemEstar.models.Status;
 import API_GestaHabitosEbemEstar.repository.MonitoringHabitsRepository;
 
 @Service
@@ -50,7 +51,7 @@ public class MonitoringHabitsService {
 
             LocalDate currentDate = LocalDate.now();
             request.setIdUser(userIdFromToken);
-            request.setStatus("Pendente");
+            request.setStatus(Status.PENDENTE);
             request.setDate(currentDate);
             request.setIdHabits(idHabits);
 

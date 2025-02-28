@@ -3,6 +3,8 @@ package API_GestaHabitosEbemEstar.models;
 import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +30,8 @@ public class MonitoringHabits {
     @Column(name = "DATA")
     private LocalDate date;
 
-    @Column(name = " Status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private Status status;
 
 }
